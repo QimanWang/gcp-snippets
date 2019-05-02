@@ -51,6 +51,7 @@ if __name__ == '__main__':
     
     filename = 'data/1.csv'
 
+    # to upload a csv, we dont need the table to be created beforehand.
     create_dataset(project+'.'+dataset_id)
     # create_table(project+'.'+dataset_id+'.'+table_id,schema)
     load_csv_from_local(filename)
