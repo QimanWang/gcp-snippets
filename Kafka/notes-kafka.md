@@ -141,4 +141,107 @@ brew cask install java8
 
 cat .bash_profile
 export PATH="$PATH:/thekafkabin"
+brew install kafka
+
+port :2181 will be used and terminal needs to be open
+./zookeeper-server-start.sh config/zookeeper.properties
+
+mkdir data/zookeeper
+cat config/zookeeper.properties
+change tempDir = data/zookeeper
+
+server.properties
+log.dirs=data/kafka
+
+start zookeeper and kafka
+
+# CLI
+//replication factor <= broker
+./bin/kafka-topics.sh --zookeeper 127.0.0.1:2181  --topic firstTopic --create --partitions 3 --replication-factor 1
+create topic
+
+--topic firstTopic --describe
+displays the number of partitions
+
+Topic:firstTopic        PartitionCount:3        ReplicationFactor:1     Configs:
+        Topic: firstTopic       Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: firstTopic       Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: firstTopic       Partition: 2    Leader: 0       Replicas: 0     Isr: 0
+
+--topic topic_name --delete
+delete topic
+
+
+producer:
+./bin/kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic firstTopic
+>adds messages
+
+./bin/kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic firstTopic --producer-property acks=all
+
+
+./bin/kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic newTopic
+this will create the topic but not have a leader, so always create the topic first
+
+# Kafka consumer
+./bin/kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic firstTopic
+now we can recieve live .
+
+./bin/kafka-console-consumer.sh --boots-server 127.0.0.1:9092 --topic firstTopic --from-beginning
+to read from begining
+
+# kafka consumer --groups
+./bin/kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic firstTopic --group myFirstApp
+we can spin up multiple consumers for same topic with same command
+
+./bin/kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic firstTopic --group myFirstApp --from-beginning
+from begining can only be run once, because committed,
+
+
+# kafka-consumer-groups
+manage consumer groups
+
+./bin/kafka-consumer-groups.sh --bootstrap-server 127.0.0.1:9092 --list
+listyall groups
+
+./bin/kafka-consumer-groups.sh --bootstrap-server 127.0.0.1:9092 --describe --group myFirstApp
+displays
+LAG 0 means read all
+also can show what/where is consuming
+
+127.0.0.1 is lcoalhost
+# resetting offset
+./bin/kafka-consumer-groups.sh --bootstrap-server 127.0.0.1:9092 --reset-offsets --to-earliest --ecexute --topic firstTopic
+resets offset for a given topic
+
+--to-earliest, --shift-by (-,+)n
+
+# Producer with keys
+
+kafka-console-producer --broker-list 127.0.0.1:9092 --topic first_topic --property parse.key=true --property key.separator=,
+> key,value
+> another key,another value
+
+# Consumer with keys
+
+kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic first_topic --from-beginning --property print.key=true --property key.separator=,
+
+# UI
+kafka tools, kafkacat yahoo/kafka
+
+
+# kafka Java programming, reproduce CLI 
+requires java 1.8
+
+pom.xml contains all the dependencies for maven
+
+
+
+# debugging
+sudo lsof -i :2181
+ , list port and pid
+lsof -n -i :9092 | grep LISTEN
+kill p_id , kills process
+ps -ax | grep name , list process with name
+
+
 
